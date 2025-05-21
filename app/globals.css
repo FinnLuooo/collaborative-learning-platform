@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 確保基本的背景和文字顏色存在 */
+body {
+  @apply bg-gray-50 text-gray-800;
+}
+
+/* 基本按鈕樣式 */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+/* 卡片基本樣式 */
+.card {
+  @apply bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200;
+}
+
+.card-hover {
+  @apply transform hover:-translate-y-1;
+}
