@@ -62,13 +62,13 @@ export default function HeatmapViewer({ weekData }) {
       >
         {selectedView === "trace" ? (
           <img
-            src="https://images.plurk.com/50yfR8MexfoMvuIxZc5jXw.jpg"
+            src="https://images.plurk.com/1uRiMHPFdFDcqqhyrzkbbO.jpg"
             alt="聯合視覺注意力軌跡圖"
             className="w-full h-full object-contain"
           />
         ) : (
           <img
-            src="https://images.plurk.com/1uRiMHPFdFDcqqhyrzkbbO.jpg"
+            src="https://images.plurk.com/50yfR8MexfoMvuIxZc5jXw.jpg"
             alt="熱區圖"
             className="w-full h-full object-contain"
           />
