@@ -6,6 +6,7 @@ import LoginButton from "./LoginButton";
 
 export default function Header({ userRole }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [language, setLanguage] = useState("zh"); // 只是用來切換顯示
 
   // 角色圖標配置
   const roleIcons = {
@@ -45,16 +46,10 @@ export default function Header({ userRole }) {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link
-              href="/about"
+              href="/privacy-policy"
               className="text-gray-600 hover:text-blue-600 transition-colors"
             >
-              關於我們
-            </Link>
-            <Link
-              href="/features"
-              className="text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              平台功能
+              隱私權政策
             </Link>
             <Link
               href="/contact"
@@ -89,6 +84,29 @@ export default function Header({ userRole }) {
                 <span className="font-medium">{roleLabels[userRole]}</span>
               </div>
             )}
+
+            {/* 語言切換按鈕 */}
+            <button
+              onClick={() => setLanguage(language === "zh" ? "en" : "zh")}
+              className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+            >
+              <svg
+                className="w-5 h-5 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                />
+              </svg>
+              <span className="font-medium text-gray-700">
+                {language === "zh" ? "EN" : "中文"}
+              </span>
+            </button>
 
             <LoginButton />
           </nav>
@@ -131,16 +149,10 @@ export default function Header({ userRole }) {
           <div className="md:hidden pb-4">
             <nav className="flex flex-col space-y-3">
               <Link
-                href="/about"
+                href="/privacy-policy"
                 className="text-gray-600 hover:text-blue-600 transition-colors py-2 border-b border-gray-100"
               >
-                關於我們
-              </Link>
-              <Link
-                href="/features"
-                className="text-gray-600 hover:text-blue-600 transition-colors py-2 border-b border-gray-100"
-              >
-                平台功能
+                隱私權政策
               </Link>
               <Link
                 href="/contact"
@@ -167,6 +179,29 @@ export default function Header({ userRole }) {
                   <span className="font-medium">{roleLabels[userRole]}</span>
                 </div>
               )}
+
+              {/* 語言切換按鈕 (移動版) */}
+              <button
+                onClick={() => setLanguage(language === "zh" ? "en" : "zh")}
+                className="self-start flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                <svg
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                  />
+                </svg>
+                <span className="font-medium text-gray-700">
+                  {language === "zh" ? "EN" : "中文"}
+                </span>
+              </button>
 
               <div className="py-2">
                 <LoginButton />
