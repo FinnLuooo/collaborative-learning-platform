@@ -133,6 +133,7 @@ export default function StudentGroupPage({ params }) {
                 currentQuestion: currentQuestion,
               }}
               classData={classData}
+              userRole="student" // 🆕 設定為學生模式
             />
           </>
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { mockData } from "@/data/mockData";
 import Header from "@/components/Header";
@@ -9,7 +9,8 @@ import AssessmentModal from "@/components/AssessmentModal";
 import VideoTutorialModal from "@/components/VideoTutorialModal";
 import Link from "next/link";
 
-export default function StudentPage() {
+// 🆕 主要內容組件
+function StudentPageContent() {
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -84,9 +85,7 @@ export default function StudentPage() {
   }
 
   return (
-    <div>
-      <Header userRole="student" />
-
+    <>
       <AssessmentModal
         userRole="student"
         isOpen={showAssessmentModal}
@@ -149,6 +148,30 @@ export default function StudentPage() {
           ))}
         </div>
       </main>
+    </>
+  );
+}
+
+// 🆕 載入組件
+function StudentPageLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">載入中...</p>
+      </div>
+    </div>
+  );
+}
+
+// 🆕 主頁面組件
+export default function StudentPage() {
+  return (
+    <div>
+      <Header userRole="student" />
+      <Suspense fallback={<StudentPageLoading />}>
+        <StudentPageContent />
+      </Suspense>
     </div>
   );
 }
