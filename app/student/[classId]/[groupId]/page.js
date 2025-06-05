@@ -6,19 +6,30 @@ import WeeklyTabs from "@/components/WeeklyTabs";
 import StepNavigation from "@/components/StepNavigation";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import HeatmapViewer from "@/components/HeatmapViewer";
-import AIFeedback from "@/components/AIFeedback";
-import CommentSection from "@/components/CommentSection";
+import FeedbackSection from "@/components/FeedbackSection"; // 🆕 新的講評區組件
 
 export default function StudentGroupPage({ params }) {
-  const { classId, groupId } = params;
-
-  const classData = mockData.classes.find((c) => c.id === classId);
-  const groupData = classData?.groups.find((g) => g.id === groupId);
-
+  const [classId, setClassId] = useState(null);
+  const [groupId, setGroupId] = useState(null);
   const [selectedWeekId, setSelectedWeekId] = useState(null);
   const [selectedWeekData, setSelectedWeekData] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [currentQuestion, setCurrentQuestion] = useState(1);
+
+  // 處理 params
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setClassId(resolvedParams.classId);
+      setGroupId(resolvedParams.groupId);
+    };
+    resolveParams();
+  }, [params]);
+
+  const classData = classId
+    ? mockData.classes.find((c) => c.id === classId)
+    : null;
+  const groupData = classData?.groups.find((g) => g.id === groupId);
 
   useEffect(() => {
     if (groupData && groupData.weeks.length > 0) {
@@ -62,30 +73,8 @@ export default function StudentGroupPage({ params }) {
   };
 
   if (!classData || !groupData) {
-    return <div className="container mx-auto px-4 py-8">小組不存在</div>;
+    return <div className="container mx-auto px-4 py-8">載入中...</div>;
   }
-
-  // 檢查任務類型
-  const isDynamicTask =
-    selectedWeekData?.isDynamicTask && classData?.taskType === "dynamic";
-  const isMultiQuestion =
-    selectedWeekData?.isMultiQuestion && classData?.taskType === "static";
-
-  // 獲取當前的留言
-  const getCurrentComments = () => {
-    if (isDynamicTask) {
-      const currentStepData = selectedWeekData.steps?.find(
-        (step) => step.id === currentStep
-      );
-      return currentStepData?.comments || [];
-    } else if (isMultiQuestion) {
-      const currentQuestionData = selectedWeekData.questions?.find(
-        (question) => question.id === currentQuestion
-      );
-      return currentQuestionData?.comments || [];
-    }
-    return selectedWeekData?.comments || [];
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -107,22 +96,24 @@ export default function StudentGroupPage({ params }) {
             />
 
             {/* 動態任務步驟導航 */}
-            {isDynamicTask && (
-              <StepNavigation
-                steps={selectedWeekData.steps}
-                currentStep={currentStep}
-                onStepChange={handleStepChange}
-              />
-            )}
+            {selectedWeekData.isDynamicTask &&
+              classData?.taskType === "dynamic" && (
+                <StepNavigation
+                  steps={selectedWeekData.steps}
+                  currentStep={currentStep}
+                  onStepChange={handleStepChange}
+                />
+              )}
 
             {/* 多題模式題目導航 */}
-            {isMultiQuestion && (
-              <QuestionNavigation
-                questions={selectedWeekData.questions}
-                currentQuestion={currentQuestion}
-                onQuestionChange={handleQuestionChange}
-              />
-            )}
+            {selectedWeekData.isMultiQuestion &&
+              classData?.taskType === "static" && (
+                <QuestionNavigation
+                  questions={selectedWeekData.questions}
+                  currentQuestion={currentQuestion}
+                  onQuestionChange={handleQuestionChange}
+                />
+              )}
 
             <HeatmapViewer
               weekData={{
@@ -133,23 +124,15 @@ export default function StudentGroupPage({ params }) {
               classData={classData}
               userRole="student"
             />
-            <AIFeedback
+
+            {/* 🆕 新的整合式講評區 - 替換原本的 AIFeedback 和 CommentSection */}
+            <FeedbackSection
               weekData={{
                 ...selectedWeekData,
                 currentStep: currentStep,
                 currentQuestion: currentQuestion,
               }}
               classData={classData}
-            />
-            <CommentSection
-              comments={getCurrentComments()}
-              stepId={
-                isDynamicTask
-                  ? currentStep
-                  : isMultiQuestion
-                  ? currentQuestion
-                  : undefined
-              }
             />
           </>
         )}

@@ -6,8 +6,7 @@ import WeeklyTabs from "@/components/WeeklyTabs";
 import StepNavigation from "@/components/StepNavigation";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import HeatmapViewer from "@/components/HeatmapViewer";
-import AIFeedback from "@/components/AIFeedback";
-import CommentSection from "@/components/CommentSection";
+import FeedbackSection from "@/components/FeedbackSection"; // 🆕 新的講評區組件
 
 export default function TeacherGroupPage({ params }) {
   const { classId, groupId } = params;
@@ -90,22 +89,6 @@ export default function TeacherGroupPage({ params }) {
     selectedWeekData?.isDynamicTask && classData?.taskType === "dynamic";
   const isMultiQuestion =
     selectedWeekData?.isMultiQuestion && classData?.taskType === "static";
-
-  // 獲取當前的留言
-  const getCurrentComments = () => {
-    if (isDynamicTask) {
-      const currentStepData = selectedWeekData.steps?.find(
-        (step) => step.id === currentStep
-      );
-      return currentStepData?.comments || [];
-    } else if (isMultiQuestion) {
-      const currentQuestionData = selectedWeekData.questions?.find(
-        (question) => question.id === currentQuestion
-      );
-      return currentQuestionData?.comments || [];
-    }
-    return selectedWeekData?.comments || [];
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -246,23 +229,16 @@ export default function TeacherGroupPage({ params }) {
               classData={classData}
               userRole="teacher"
             />
-            <AIFeedback
+
+            {/* 🆕 新的整合式講評區 - 替換原本的 AIFeedback 和 CommentSection */}
+            <FeedbackSection
               weekData={{
                 ...selectedWeekData,
                 currentStep: currentStep,
                 currentQuestion: currentQuestion,
               }}
               classData={classData}
-            />
-            <CommentSection
-              comments={getCurrentComments()}
-              stepId={
-                isDynamicTask
-                  ? currentStep
-                  : isMultiQuestion
-                  ? currentQuestion
-                  : undefined
-              }
+              userRole="teacher" // 🆕 設定為老師模式
             />
           </>
         )}

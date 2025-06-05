@@ -4,7 +4,7 @@ import { useState } from "react";
 export default function HeatmapViewer({ weekData, classData, userRole }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
-  const [selectedView, setSelectedView] = useState("trace"); // "trace" 或 "heatmap"
+  const [selectedView, setSelectedView] = useState("trace"); // "trace" 或 "heatmap" 或 "video"
   const [selectedImageType, setSelectedImageType] = useState("original"); // "original", "explanation", "ai"
 
   // 檢查任務類型
@@ -140,25 +140,7 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
         <p className="text-lg">{currentData.question}</p>
       </div>
 
-      {/* 今天我表現得怎麼樣區塊 */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mb-6 border border-purple-200">
-        <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-purple-800">
-            今天我表現得怎麼樣？
-          </h4>
-          <div className="text-4xl">
-            {getPerformanceEmoji(currentData.performanceScore || 75)}
-          </div>
-        </div>
-        <div className="mt-2">
-          <div className="flex items-center space-x-4">
-            <span className="text-2xl">😊</span>
-            <span className="text-2xl">😐</span>
-            <span className="text-2xl">😢</span>
-          </div>
-        </div>
-      </div>
-
+      {/* 🆕 視覺分析圖區塊標題和按鈕 */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-blue-600">視覺分析圖</h3>
         <div className="flex space-x-2">
@@ -182,183 +164,260 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
           >
             熱區圖
           </button>
+          {/* 🆕 錄影紀錄按鈕 */}
+          <button
+            onClick={() => setSelectedView("video")}
+            className={`px-3 py-1 rounded transition-colors ${
+              selectedView === "video"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            📹 錄影紀錄
+          </button>
         </div>
       </div>
 
-      {/* 雙欄對比顯示區域 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
-        {/* 實作圖（左欄） */}
-        <div className="space-y-2">
-          <h4 className="text-lg font-semibold text-gray-800 text-center">
-            實作{selectedView === "trace" ? "注意力軌跡圖" : "熱區圖"}
-          </h4>
-
-          {/* 圖片切換按鈕 */}
-          <div className="flex justify-center space-x-2 mb-3">
-            <button
-              onClick={() => setSelectedImageType("original")}
-              className={`px-3 py-1 text-sm rounded transition-colors ${
-                selectedImageType === "original"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-              }`}
-            >
-              {getButtonText("original")}
-            </button>
-            <button
-              onClick={() => setSelectedImageType("explanation")}
-              className={`px-3 py-1 text-sm rounded transition-colors ${
-                selectedImageType === "explanation"
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-              }`}
-            >
-              {getButtonText("explanation")}
-            </button>
-            <button
-              onClick={() => setSelectedImageType("ai")}
-              className={`px-3 py-1 text-sm rounded transition-colors ${
-                selectedImageType === "ai"
-                  ? "bg-purple-500 text-white"
-                  : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-              }`}
-            >
-              {getButtonText("ai")}
-            </button>
-          </div>
-
-          <div
-            className="relative w-full rounded-lg overflow-hidden bg-gray-100 border-2 border-blue-200"
-            style={{ height: "300px", marginTop: "12px" }}
-          >
-            <img
-              src={getCurrentImageUrl()}
-              alt={`實作${
-                selectedView === "trace" ? "注意力軌跡圖" : "熱區圖"
-              }`}
-              className="w-full h-full object-contain"
-            />
-            {/* AI解說圖的提示 */}
-            {selectedImageType === "ai" && (
-              <div className="absolute top-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
-                AI解說功能開發中
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 理想圖（右欄） */}
-        <div className="space-y-2">
-          <h4 className="text-lg font-semibold text-gray-800 text-center">
-            理想{selectedView === "trace" ? "注意力軌跡圖" : "熱區圖"}
-          </h4>
-
-          {/* 右欄增加相同高度的佔位空間，確保兩欄高度一致 */}
-          <div
-            className="flex justify-center space-x-2 mb-3"
-            style={{ height: "32px" }}
-          >
-            {/* 透明佔位元素，保持與左欄按鈕相同的高度 */}
-            <div className="invisible px-3 py-1 text-sm">佔位</div>
-          </div>
-
-          <div
-            className="relative w-full rounded-lg overflow-hidden bg-gray-100 border-2 border-green-200"
-            style={{ height: "300px" }}
-          >
-            {selectedView === "trace" ? (
-              <img
-                src={
-                  currentData.idealTraceImage ||
-                  "https://images.plurk.com/12Q8yTDRmSBDaTPy2CcKTf.jpg"
-                }
-                alt="理想注意力軌跡圖"
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <img
-                src={
-                  currentData.idealHeatmapImage ||
-                  "https://images.plurk.com/6OgcTXdJR7GLWcZ4RgGk9u.jpg"
-                }
-                alt="理想熱區圖"
-                className="w-full h-full object-contain"
-              />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 對比說明文字 */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-        <div className="flex items-start">
-          <svg
-            className="h-5 w-5 text-yellow-400 mr-2 mt-0.5 flex-shrink-0"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1-1v3a1 1 0 002 0V4a1 1 0 00-1-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <div>
-            <p className="text-sm text-yellow-700 font-medium">對比分析說明</p>
-            <p className="text-sm text-yellow-600 mt-1">
-              左側顯示學生實際的
-              {selectedView === "trace" ? "注意力軌跡" : "注意力熱區"}，
-              右側顯示理想的學習模式。透過對比可以了解學習效果和改進方向。
-              {selectedImageType === "explanation" && "目前顯示文字說明版本，"}
-              {selectedImageType === "ai" && "AI解說功能正在開發中，"}
-              可使用按鈕切換不同的圖片視圖。
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-center mb-4">
-        <button
-          onClick={handleAnalyze}
-          disabled={analyzing}
-          className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded-lg flex items-center justify-center transition-colors"
-        >
-          {analyzing ? (
-            <>
+      {/* 🆕 錄影紀錄顯示區域 */}
+      {selectedView === "video" && (
+        <div className="mb-6">
+          <div className="bg-gray-100 rounded-lg p-8 text-center">
+            <div className="mb-4">
               <svg
-                className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                xmlns="http://www.w3.org/2000/svg"
+                className="w-16 h-16 mx-auto text-gray-400"
                 fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
                 <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
               </svg>
-              正在分析中...
-            </>
-          ) : (
-            "AI 分析"
-          )}
-        </button>
-      </div>
+            </div>
+            <h4 className="text-lg font-semibold text-gray-700 mb-2">
+              穿戴式眼動追蹤裝置錄影
+            </h4>
+            <p className="text-gray-600 mb-4">
+              此功能將顯示學習過程中穿戴式眼動追蹤裝置所錄製的影片，
+              <br />
+              可以回放實際的學習情況和眼球移動軌跡。
+            </p>
+            <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3">
+              <p className="text-yellow-800 text-sm">
+                🚧 錄影播放功能開發中，敬請期待！
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* 雙欄對比顯示區域 - 只在非錄影模式顯示 */}
+      {selectedView !== "video" && (
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
+            {/* 實作圖（左欄） */}
+            <div className="space-y-2">
+              <h4 className="text-lg font-semibold text-gray-800 text-center">
+                實作{selectedView === "trace" ? "注意力軌跡圖" : "熱區圖"}
+              </h4>
+
+              {/* 圖片切換按鈕 */}
+              <div className="flex justify-center space-x-2 mb-3">
+                <button
+                  onClick={() => setSelectedImageType("original")}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    selectedImageType === "original"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                  }`}
+                >
+                  {getButtonText("original")}
+                </button>
+                <button
+                  onClick={() => setSelectedImageType("explanation")}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    selectedImageType === "explanation"
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                  }`}
+                >
+                  {getButtonText("explanation")}
+                </button>
+                <button
+                  onClick={() => setSelectedImageType("ai")}
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    selectedImageType === "ai"
+                      ? "bg-purple-500 text-white"
+                      : "bg-gray-200 hover:bg-gray-300 text-gray-700"
+                  }`}
+                >
+                  {getButtonText("ai")}
+                </button>
+              </div>
+
+              <div
+                className="relative w-full rounded-lg overflow-hidden bg-gray-100 border-2 border-blue-200"
+                style={{ height: "300px", marginTop: "12px" }}
+              >
+                <img
+                  src={getCurrentImageUrl()}
+                  alt={`實作${
+                    selectedView === "trace" ? "注意力軌跡圖" : "熱區圖"
+                  }`}
+                  className="w-full h-full object-contain"
+                />
+                {/* AI解說圖的提示 */}
+                {selectedImageType === "ai" && (
+                  <div className="absolute top-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
+                    AI解說功能開發中
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 理想圖（右欄） */}
+            <div className="space-y-2">
+              <h4 className="text-lg font-semibold text-gray-800 text-center">
+                理想{selectedView === "trace" ? "注意力軌跡圖" : "熱區圖"}
+              </h4>
+
+              {/* 右欄增加相同高度的佔位空間，確保兩欄高度一致 */}
+              <div
+                className="flex justify-center space-x-2 mb-3"
+                style={{ height: "32px" }}
+              >
+                {/* 透明佔位元素，保持與左欄按鈕相同的高度 */}
+                <div className="invisible px-3 py-1 text-sm">佔位</div>
+              </div>
+
+              <div
+                className="relative w-full rounded-lg overflow-hidden bg-gray-100 border-2 border-green-200"
+                style={{ height: "300px" }}
+              >
+                {selectedView === "trace" ? (
+                  <img
+                    src={
+                      currentData.idealTraceImage ||
+                      "https://images.plurk.com/12Q8yTDRmSBDaTPy2CcKTf.jpg"
+                    }
+                    alt="理想注意力軌跡圖"
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <img
+                    src={
+                      currentData.idealHeatmapImage ||
+                      "https://images.plurk.com/6OgcTXdJR7GLWcZ4RgGk9u.jpg"
+                    }
+                    alt="理想熱區圖"
+                    className="w-full h-full object-contain"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* 對比說明文字 */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+            <div className="flex items-start">
+              <svg
+                className="h-5 w-5 text-yellow-400 mr-2 mt-0.5 flex-shrink-0"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1-1v3a1 1 0 002 0V4a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div>
+                <p className="text-sm text-yellow-700 font-medium">
+                  對比分析說明
+                </p>
+                <p className="text-sm text-yellow-600 mt-1">
+                  左側顯示學生實際的
+                  {selectedView === "trace" ? "注意力軌跡" : "注意力熱區"}，
+                  右側顯示理想的學習模式。透過對比可以了解學習效果和改進方向。
+                  {selectedImageType === "explanation" &&
+                    "目前顯示文字說明版本，"}
+                  {selectedImageType === "ai" && "AI解說功能正在開發中，"}
+                  可使用按鈕切換不同的圖片視圖。
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* AI 分析按鈕 - 只在非錄影模式顯示 */}
+      {selectedView !== "video" && (
+        <div className="flex justify-center mb-4">
+          <button
+            onClick={handleAnalyze}
+            disabled={analyzing}
+            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-2 px-6 rounded-lg flex items-center justify-center transition-colors"
+          >
+            {analyzing ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                正在分析中...
+              </>
+            ) : (
+              "AI 分析"
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* AI 分析結果 */}
       {analysisResult && (
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
           <h4 className="font-bold text-blue-700 mb-2">AI 分析報告</h4>
           <p>{analysisResult}</p>
         </div>
       )}
+
+      {/* 🆕 今天我表現得怎麼樣區塊 - 移到 AI 分析下面 */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mb-6 border border-purple-200">
+        <div className="flex items-center justify-between">
+          <h4 className="text-lg font-semibold text-purple-800">
+            今天我表現得怎麼樣？
+          </h4>
+          <div className="text-4xl">
+            {getPerformanceEmoji(currentData.performanceScore || 75)}
+          </div>
+        </div>
+        <div className="mt-2">
+          <div className="flex items-center space-x-4">
+            <span className="text-2xl">😊</span>
+            <span className="text-2xl">😐</span>
+            <span className="text-2xl">😢</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

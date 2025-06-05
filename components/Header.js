@@ -45,6 +45,29 @@ export default function Header({ userRole }) {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
+            {/* 🆕 了解平台背景按鈕 */}
+            <Link
+              href={`/platform-background${
+                userRole ? `?role=${userRole}` : ""
+              }`}
+              className="inline-flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>了解平台背景</span>
+            </Link>
+
             <Link
               href="/privacy-policy"
               className="text-gray-600 hover:text-blue-600 transition-colors"
@@ -148,6 +171,29 @@ export default function Header({ userRole }) {
         {isMenuOpen && (
           <div className="md:hidden pb-4">
             <nav className="flex flex-col space-y-3">
+              {/* 🆕 了解平台背景按鈕 (移動版) */}
+              <Link
+                href={`/platform-background${
+                  userRole ? `?role=${userRole}` : ""
+                }`}
+                className="inline-flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors py-2 border-b border-gray-100"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <span>了解平台背景</span>
+              </Link>
+
               <Link
                 href="/privacy-policy"
                 className="text-gray-600 hover:text-blue-600 transition-colors py-2 border-b border-gray-100"

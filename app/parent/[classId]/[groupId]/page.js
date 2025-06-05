@@ -6,8 +6,7 @@ import WeeklyTabs from "@/components/WeeklyTabs";
 import StepNavigation from "@/components/StepNavigation";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import HeatmapViewer from "@/components/HeatmapViewer";
-import AIFeedback from "@/components/AIFeedback";
-import CommentSection from "@/components/CommentSection";
+import FeedbackSection from "@/components/FeedbackSection"; // 🆕 新的講評區組件
 
 export default function ParentGroupPage({ params }) {
   // 使用 use() 解包 params
@@ -70,22 +69,6 @@ export default function ParentGroupPage({ params }) {
     selectedWeekData?.isDynamicTask && classData?.taskType === "dynamic";
   const isMultiQuestion =
     selectedWeekData?.isMultiQuestion && classData?.taskType === "static";
-
-  // 獲取當前的留言
-  const getCurrentComments = () => {
-    if (isDynamicTask) {
-      const currentStepData = selectedWeekData.steps?.find(
-        (step) => step.id === currentStep
-      );
-      return currentStepData?.comments || [];
-    } else if (isMultiQuestion) {
-      const currentQuestionData = selectedWeekData.questions?.find(
-        (question) => question.id === currentQuestion
-      );
-      return currentQuestionData?.comments || [];
-    }
-    return selectedWeekData?.comments || [];
-  };
 
   return (
     <div>
@@ -197,25 +180,16 @@ export default function ParentGroupPage({ params }) {
               classData={classData}
               userRole="parent"
             />
-            <AIFeedback
+
+            {/* 🆕 新的整合式講評區 - 替換原本的 AIFeedback 和 CommentSection，移除家長總結 */}
+            <FeedbackSection
               weekData={{
                 ...selectedWeekData,
                 currentStep: currentStep,
                 currentQuestion: currentQuestion,
               }}
               classData={classData}
-              isParent={true}
-            />
-            <CommentSection
-              comments={getCurrentComments()}
-              isReadOnly={true}
-              stepId={
-                isDynamicTask
-                  ? currentStep
-                  : isMultiQuestion
-                  ? currentQuestion
-                  : undefined
-              }
+              userRole="parent" // 🆕 設定為家長模式
             />
           </>
         )}

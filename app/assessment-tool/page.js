@@ -1,11 +1,11 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
 import Header from "@/components/Header";
 import Link from "next/link";
 
-// 評估內容數據
+// 評估內容數據（保持原有的數據結構）
 const assessmentData = {
   teacher: {
     title: "教師版｜理解眼動資料視覺化的後設視覺能力評估表",
@@ -15,6 +15,7 @@ const assessmentData = {
     buttonColor: "bg-green-600 hover:bg-green-700",
     cardBorder: "border-green-200",
     badgeColor: "bg-green-100 text-green-800",
+    storageKey: "teacher_assessment_completed",
     aspects: [
       {
         title: "視覺化知識理解",
@@ -71,6 +72,7 @@ const assessmentData = {
     buttonColor: "bg-blue-600 hover:bg-blue-700",
     cardBorder: "border-blue-200",
     badgeColor: "bg-blue-100 text-blue-800",
+    storageKey: "student_assessment_completed",
     aspects: [
       {
         title: "我懂這張圖的意思嗎？",
@@ -91,24 +93,6 @@ const assessmentData = {
         ],
       },
       {
-        title: "我怎麼知道這張圖好不好？",
-        levels: [
-          "沒想過圖好不好。",
-          "覺得圖好看或喜歡就是好。",
-          "會想圖是否說得清楚、內容正確、幫助了解問題。",
-          "從多方面來評價圖的內容、表現和幫助程度。",
-        ],
-      },
-      {
-        title: "我有用什麼方法來看懂圖嗎？",
-        levels: [
-          "沒用方法。",
-          "只用回想課堂內容。",
-          "會比較、推理或轉換方式幫自己理解。",
-          "會用像聚焦重點、解釋內容或自己修正圖的方法幫助學習。",
-        ],
-      },
-      {
         title: "這張圖會不會有問題？會不會不公平？",
         levels: [
           "沒想過圖可能有問題。",
@@ -121,56 +105,39 @@ const assessmentData = {
   },
   parent: {
     title: "家長版｜理解眼動資料視覺化的後設視覺能力評估表",
-    subtitle: "請評估您的孩子在以下各面向的表現程度",
+    subtitle: "請評估您自己對眼動視覺化技術的理解程度",
     color: "purple",
     bgColor: "bg-purple-50",
     buttonColor: "bg-purple-600 hover:bg-purple-700",
     cardBorder: "border-purple-200",
     badgeColor: "bg-purple-100 text-purple-800",
+    storageKey: "parent_assessment_completed",
     aspects: [
       {
-        title: "孩子理解圖表的能力",
+        title: "我理解眼動追蹤技術嗎？",
         levels: [
-          "孩子不太能從圖表中獲得資訊，也不知道圖的意義。",
-          "孩子知道圖可以幫助學習和記憶，但未想到圖可能有誤差。",
-          "孩子知道圖表能夠簡化複雜內容，也能意識到它不是百分百的實物呈現。",
-          "孩子了解圖是為幫助學習而設計的，有可能會產生誤解，並懂得用圖來建立知識。",
+          "完全不了解眼動追蹤是什麼，也不知道它能做什麼。",
+          "知道眼動追蹤可以記錄眼睛看的地方，但不清楚具體用途。",
+          "了解眼動追蹤能幫助分析學習過程，知道它在教育上的基本應用。",
+          "深度理解眼動追蹤技術原理和教育應用，能評估其價值和限制。",
         ],
       },
       {
-        title: "孩子的自我察覺",
+        title: "我能看懂眼動視覺化圖表嗎？",
         levels: [
-          "孩子沒意識到看不懂的地方。",
-          "孩子知道哪些地方不懂。",
-          "孩子會事前想清楚要怎麼看圖／選圖。",
-          "孩子會邊看邊檢查是否看懂，也會之後再反思圖是否有幫助。",
+          "完全看不懂熱區圖和軌跡圖在表達什麼。",
+          "大概知道顏色和線條代表注意力，但不會解讀細節。",
+          "能理解基本的注意力分布和軌跡含義，會看重點區域。",
+          "能深入分析視覺化圖表，理解複雜的注意力模式和學習行為。",
         ],
       },
       {
-        title: "孩子評價圖表的方式",
+        title: "我能與老師進行有效的溝通嗎？",
         levels: [
-          "不會判斷圖表是否好用。",
-          "根據圖表好不好看來判斷。",
-          "孩子會依據內容是否正確、是否易懂來做出評價。",
-          "孩子能全面性地評估圖是否適合學習目的、內容準確、清楚表達。",
-        ],
-      },
-      {
-        title: "孩子是否有看圖的策略",
-        levels: [
-          "看圖時沒什麼特別方法。",
-          "會用課堂記憶幫忙理解。",
-          "會用比對、推理等方式幫助自己看懂。",
-          "會用高階策略來看圖，例如集中注意力、自己解釋、發現錯誤並修正。",
-        ],
-      },
-      {
-        title: "孩子是否意識到圖表的風險與倫理問題",
-        levels: [
-          "完全忽略圖可能帶來的問題。",
-          "注意到資料敏感性但不清楚怎麼處理。",
-          "能辨識圖表中的偏誤或風險，並會說明其限制。",
-          "能全面考慮隱私、同意、責任與公平性，並採取保護措施。",
+          "不知道如何與老師討論這些視覺化分析結果。",
+          "會詢問老師相關問題，但不太清楚重點在哪裡。",
+          "能根據分析結果與老師討論孩子的學習狀況和改進方法。",
+          "能深入與老師協作，共同運用眼動分析資料制定個人化學習計畫。",
         ],
       },
     ],
@@ -179,8 +146,79 @@ const assessmentData = {
 
 function AssessmentContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const role = searchParams.get("role") || "student";
   const data = assessmentData[role] || assessmentData.student;
+
+  // 用於追蹤每個面向的選擇
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleAnswerChange = (aspectIndex, levelIndex) => {
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [aspectIndex]: levelIndex,
+    }));
+  };
+
+  const handleSubmit = () => {
+    // 檢查是否所有問題都已回答
+    const totalQuestions = data.aspects.length;
+    const answeredQuestions = Object.keys(selectedAnswers).length;
+
+    if (answeredQuestions < totalQuestions) {
+      alert(
+        `請完成所有評估項目。您還有 ${
+          totalQuestions - answeredQuestions
+        } 個項目未完成。`
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // 模擬提交過程
+    setTimeout(() => {
+      // 計算平均等級
+      const totalScore = Object.values(selectedAnswers).reduce(
+        (sum, level) => sum + parseInt(level),
+        0
+      );
+      const averageLevel = (totalScore / totalQuestions).toFixed(1);
+
+      // 檢查是否需要觀看影片（等級主要在 0-1）
+      const lowScoreCount = Object.values(selectedAnswers).filter(
+        (level) => parseInt(level) <= 1
+      ).length;
+      const needsVideo = lowScoreCount >= Math.ceil(totalQuestions / 2); // 超過一半的題目等級在 0-1
+
+      if (needsVideo) {
+        // 需要看影片 - 跳轉回角色頁面並觸發影片彈窗
+        setIsSubmitting(false);
+        alert(
+          `📊 評估完成！\n您的平均等級：${averageLevel}\n\n由於您的等級主要在 0-1，需要先觀看圖表解讀教學影片才能使用平台功能。`
+        );
+
+        // 使用 URL 參數來觸發影片彈窗
+        router.push(`/${role}?showVideo=true`);
+      } else {
+        // 直接通過 - 標記完成流程
+        sessionStorage.setItem(`${role}_completed_flow`, "true");
+        alert(
+          `🎉 評估完成！\n您的平均等級：${averageLevel}\n現在可以開始使用平台功能了。`
+        );
+
+        // 🆕 針對家長角色，完成評估後直接導向小孩組別
+        if (role === "parent") {
+          // 直接導向 Class A, Group 1（小明、小美）
+          router.push("/parent/classA/group1");
+        } else {
+          // 其他角色返回對應的角色首頁
+          router.push(`/${role}`);
+        }
+      }
+    }, 1500);
+  };
 
   return (
     <div>
@@ -262,11 +300,27 @@ function AssessmentContent() {
                 <div className="grid gap-4">
                   {aspect.levels.map((level, levelIndex) => (
                     <label key={levelIndex} className="cursor-pointer">
-                      <div className="flex items-start space-x-4 p-4 rounded-lg border-2 border-gray-200 hover:border-gray-300 transition-colors">
+                      <div
+                        className={`flex items-start space-x-4 p-4 rounded-lg border-2 transition-colors ${
+                          selectedAnswers[aspectIndex] === levelIndex.toString()
+                            ? `border-${data.color}-500 bg-${data.color}-50`
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
                         <input
                           type="radio"
                           name={`aspect-${aspectIndex}`}
                           value={levelIndex}
+                          checked={
+                            selectedAnswers[aspectIndex] ===
+                            levelIndex.toString()
+                          }
+                          onChange={() =>
+                            handleAnswerChange(
+                              aspectIndex,
+                              levelIndex.toString()
+                            )
+                          }
                           className={`mt-1 h-4 w-4 text-${data.color}-600 focus:ring-${data.color}-500 border-gray-300`}
                         />
                         <div className="flex-1">
@@ -305,9 +359,37 @@ function AssessmentContent() {
         {/* 提交按鈕 */}
         <div className="mt-8 text-center">
           <button
-            className={`${data.buttonColor} text-white px-8 py-3 rounded-lg font-medium text-lg transition-colors duration-200 shadow-lg hover:shadow-xl`}
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className={`${data.buttonColor} text-white px-8 py-3 rounded-lg font-medium text-lg transition-colors duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed`}
           >
-            完成評估
+            {isSubmitting ? (
+              <div className="flex items-center">
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                處理中...
+              </div>
+            ) : (
+              "完成評估"
+            )}
           </button>
         </div>
 

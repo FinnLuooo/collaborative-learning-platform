@@ -1,8 +1,19 @@
 "use client";
 
 import Header from "@/components/Header";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
+  // 🔧 處理角色按鈕點擊，清除評估狀態並導向角色頁面
+  const handleRoleClick = (role) => {
+    // 清除該角色的評估完成狀態，強制重新評估
+    sessionStorage.removeItem(`${role}_completed_flow`);
+    // 導向角色頁面
+    router.push(`/${role}`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* 使用共用的 Header 組件 */}
@@ -13,9 +24,9 @@ export default function Home() {
         <div className="max-w-5xl w-full mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* 學生卡片 */}
-            <a
-              href="/student"
-              className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            <button
+              onClick={() => handleRoleClick("student")}
+              className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden text-left w-full"
             >
               <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-3"></div>
               <div className="p-8 flex flex-col items-center">
@@ -46,12 +57,12 @@ export default function Home() {
                   點擊進入 →
                 </p>
               </div>
-            </a>
+            </button>
 
             {/* 老師卡片 */}
-            <a
-              href="/teacher"
-              className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            <button
+              onClick={() => handleRoleClick("teacher")}
+              className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden text-left w-full"
             >
               <div className="bg-gradient-to-r from-green-500 to-green-600 h-3"></div>
               <div className="p-8 flex flex-col items-center">
@@ -93,12 +104,12 @@ export default function Home() {
                   點擊進入 →
                 </p>
               </div>
-            </a>
+            </button>
 
             {/* 家長卡片 */}
-            <a
-              href="/parent"
-              className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            <button
+              onClick={() => handleRoleClick("parent")}
+              className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 overflow-hidden text-left w-full"
             >
               <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-3"></div>
               <div className="p-8 flex flex-col items-center">
@@ -125,7 +136,7 @@ export default function Home() {
                   點擊進入 →
                 </p>
               </div>
-            </a>
+            </button>
           </div>
         </div>
       </main>
