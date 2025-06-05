@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { mockData } from "@/data/mockData";
 import Header from "@/components/Header";
@@ -9,7 +9,8 @@ import AssessmentModal from "@/components/AssessmentModal";
 import VideoTutorialModal from "@/components/VideoTutorialModal";
 import Link from "next/link";
 
-export default function ParentPage() {
+// 🆕 主要內容組件 - 處理所有需要 useSearchParams 的邏輯
+function ParentPageContent() {
   const [showAssessmentModal, setShowAssessmentModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,9 +84,7 @@ export default function ParentPage() {
   }
 
   return (
-    <div>
-      <Header userRole="parent" />
-
+    <>
       <AssessmentModal
         userRole="parent"
         isOpen={showAssessmentModal}
@@ -200,6 +199,30 @@ export default function ParentPage() {
           </div>
         </div>
       </main>
+    </>
+  );
+}
+
+// 🆕 載入組件
+function ParentPageLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">載入中...</p>
+      </div>
+    </div>
+  );
+}
+
+// 🆕 主頁面組件 - 使用 Suspense 包裝
+export default function ParentPage() {
+  return (
+    <div>
+      <Header userRole="parent" />
+      <Suspense fallback={<ParentPageLoading />}>
+        <ParentPageContent />
+      </Suspense>
     </div>
   );
 }
