@@ -6,10 +6,21 @@ import WeeklyTabs from "@/components/WeeklyTabs";
 import StepNavigation from "@/components/StepNavigation";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import HeatmapViewer from "@/components/HeatmapViewer";
-import FeedbackSection from "@/components/FeedbackSection"; // 🆕 新的講評區組件
+import ProtectedFeedbackSection from "@/components/ProtectedFeedbackSection";
 
 export default function TeacherGroupPage({ params }) {
-  const { classId, groupId } = params;
+  const [classId, setClassId] = useState(null);
+  const [groupId, setGroupId] = useState(null);
+
+  // 處理 params
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setClassId(resolvedParams.classId);
+      setGroupId(resolvedParams.groupId);
+    };
+    resolveParams();
+  }, [params]);
   const classData = mockData.classes.find((c) => c.id === classId);
   const groupData = classData?.groups.find((g) => g.id === groupId);
 
@@ -231,14 +242,14 @@ export default function TeacherGroupPage({ params }) {
             />
 
             {/* 🆕 新的整合式講評區 - 替換原本的 AIFeedback 和 CommentSection */}
-            <FeedbackSection
+            <ProtectedFeedbackSection
               weekData={{
                 ...selectedWeekData,
                 currentStep: currentStep,
                 currentQuestion: currentQuestion,
               }}
               classData={classData}
-              userRole="teacher" // 🆕 設定為老師模式
+              userRole="teacher"
             />
           </>
         )}

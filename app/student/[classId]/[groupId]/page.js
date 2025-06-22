@@ -6,7 +6,7 @@ import WeeklyTabs from "@/components/WeeklyTabs";
 import StepNavigation from "@/components/StepNavigation";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import HeatmapViewer from "@/components/HeatmapViewer";
-import FeedbackSection from "@/components/FeedbackSection"; // 🆕 新的講評區組件
+import ProtectedFeedbackSection from "@/components/ProtectedFeedbackSection";
 
 export default function StudentGroupPage({ params }) {
   const [classId, setClassId] = useState(null);
@@ -126,14 +126,14 @@ export default function StudentGroupPage({ params }) {
             />
 
             {/* 🆕 新的整合式講評區 - 替換原本的 AIFeedback 和 CommentSection */}
-            <FeedbackSection
+            <ProtectedFeedbackSection
               weekData={{
                 ...selectedWeekData,
                 currentStep: currentStep,
                 currentQuestion: currentQuestion,
               }}
               classData={classData}
-              userRole="student" // 🆕 設定為學生模式
+              userRole="student"
             />
           </>
         )}

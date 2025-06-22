@@ -1,11 +1,13 @@
 "use client";
 import { useState } from "react";
+import AIExplanationModal from "./AIExplanationModal"; // 🆕 引入新的 AI 解說彈窗
 
 export default function HeatmapViewer({ weekData, classData, userRole }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const [selectedView, setSelectedView] = useState("trace"); // "trace" 或 "heatmap" 或 "video"
   const [selectedImageType, setSelectedImageType] = useState("original"); // "original", "explanation", "ai"
+  const [showAIExplanation, setShowAIExplanation] = useState(false); // 🆕 控制 AI 解說彈窗
 
   // 檢查任務類型
   const isDynamicTask =
@@ -51,6 +53,11 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
     }, 1500);
   };
 
+  // 🆕 處理 AI 解說按鈕點擊
+  const handleAIExplanation = () => {
+    setShowAIExplanation(true);
+  };
+
   // 獲取表現評分的表情符號
   const getPerformanceEmoji = (score) => {
     if (score >= 80) return "😊";
@@ -74,6 +81,17 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
     }
   };
 
+  // 🆕 處理 AI 解說按鈕的特殊邏輯
+  const handleImageTypeChange = (type) => {
+    if (type === "ai") {
+      // 點擊 AI 解說按鈕時，打開新的彈窗而不是切換圖片
+      handleAIExplanation();
+    } else {
+      // 其他按鈕正常切換圖片
+      setSelectedImageType(type);
+    }
+  };
+
   // 獲取當前圖片URL
   const getCurrentImageUrl = () => {
     const currentTraceUrl =
@@ -90,11 +108,8 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
 
     if (selectedImageType === "explanation") {
       return explanationImageUrl;
-    } else if (selectedImageType === "ai") {
-      // AI解說圖暫時使用原始圖（因為沒有實際圖片）
-      return selectedView === "trace" ? currentTraceUrl : currentHeatmapUrl;
     } else {
-      // 原始圖
+      // 原始圖 (AI解說按鈕不再切換圖片，而是打開彈窗)
       return selectedView === "trace" ? currentTraceUrl : currentHeatmapUrl;
     }
   };
@@ -224,10 +239,10 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
                 實作{selectedView === "trace" ? "注意力軌跡圖" : "熱區圖"}
               </h4>
 
-              {/* 圖片切換按鈕 */}
+              {/* 🆕 修改圖片切換按鈕邏輯 */}
               <div className="flex justify-center space-x-2 mb-3">
                 <button
-                  onClick={() => setSelectedImageType("original")}
+                  onClick={() => handleImageTypeChange("original")}
                   className={`px-3 py-1 text-sm rounded transition-colors ${
                     selectedImageType === "original"
                       ? "bg-blue-500 text-white"
@@ -237,7 +252,7 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
                   {getButtonText("original")}
                 </button>
                 <button
-                  onClick={() => setSelectedImageType("explanation")}
+                  onClick={() => handleImageTypeChange("explanation")}
                   className={`px-3 py-1 text-sm rounded transition-colors ${
                     selectedImageType === "explanation"
                       ? "bg-green-500 text-white"
@@ -246,13 +261,10 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
                 >
                   {getButtonText("explanation")}
                 </button>
+                {/* 🆕 AI解說按鈕 - 現在點擊會打開彈窗 */}
                 <button
-                  onClick={() => setSelectedImageType("ai")}
-                  className={`px-3 py-1 text-sm rounded transition-colors ${
-                    selectedImageType === "ai"
-                      ? "bg-purple-500 text-white"
-                      : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                  }`}
+                  onClick={() => handleImageTypeChange("ai")}
+                  className="px-3 py-1 text-sm rounded transition-colors bg-purple-500 hover:bg-purple-600 text-white"
                 >
                   {getButtonText("ai")}
                 </button>
@@ -269,12 +281,6 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
                   }`}
                   className="w-full h-full object-contain"
                 />
-                {/* AI解說圖的提示 */}
-                {selectedImageType === "ai" && (
-                  <div className="absolute top-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
-                    AI解說功能開發中
-                  </div>
-                )}
               </div>
             </div>
 
@@ -344,8 +350,7 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
                   右側顯示理想的學習模式。透過對比可以了解學習效果和改進方向。
                   {selectedImageType === "explanation" &&
                     "目前顯示文字說明版本，"}
-                  {selectedImageType === "ai" && "AI解說功能正在開發中，"}
-                  可使用按鈕切換不同的圖片視圖。
+                  可使用按鈕切換不同的圖片視圖或打開 AI 解說功能。
                 </p>
               </div>
             </div>
@@ -418,6 +423,15 @@ export default function HeatmapViewer({ weekData, classData, userRole }) {
           </div>
         </div>
       </div>
+
+      {/* 🆕 AI 解說彈窗 */}
+      <AIExplanationModal
+        isOpen={showAIExplanation}
+        onClose={() => setShowAIExplanation(false)}
+        userRole={userRole}
+        selectedView={selectedView}
+        currentData={currentData}
+      />
     </div>
   );
 }

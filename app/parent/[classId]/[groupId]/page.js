@@ -6,7 +6,7 @@ import WeeklyTabs from "@/components/WeeklyTabs";
 import StepNavigation from "@/components/StepNavigation";
 import QuestionNavigation from "@/components/QuestionNavigation";
 import HeatmapViewer from "@/components/HeatmapViewer";
-import FeedbackSection from "@/components/FeedbackSection";
+import ProtectedFeedbackSection from "@/components/ProtectedFeedbackSection";
 
 // 🆕 將主要內容組件分離出來
 function ParentGroupContent({ classId, groupId }) {
@@ -178,14 +178,14 @@ function ParentGroupContent({ classId, groupId }) {
           />
 
           {/* 🆕 新的整合式講評區 - 替換原本的 AIFeedback 和 CommentSection，移除家長總結 */}
-          <FeedbackSection
+          <ProtectedFeedbackSection
             weekData={{
               ...selectedWeekData,
               currentStep: currentStep,
               currentQuestion: currentQuestion,
             }}
             classData={classData}
-            userRole="parent" // 🆕 設定為家長模式
+            userRole="parent"
           />
         </>
       )}
